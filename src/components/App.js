@@ -1,57 +1,82 @@
-import React from "react";
+import React,{useState} from "react";
 import "./../styles/App.css";
 
-function App(){
-  const [input, setInput] = useState("");
-  const [data, setData] = useState([]);
-  const [selectedData, setSelectedData] = useState("");
-  
-    function getInput(e) {
-    setInput(e.target.value);
-  }
+function App() {
+const [lists,setLists]=useState();
+const [item,setItem]=useState([]);
+const [toggle,setToggle]=useState(true);
+const [edit,setEdit]=useState();
+const [update,setUpdate]=useState();
+const click=()=>{
+	if(!lists){
 
-  function addData() {
-   if(!input || /^\s*$/.test(input)) {
-      return;
-    } else if(input) {
-      if (selectedData) {
-        const copyData = [...data];
-        const index = copyData.findIndex((item) => item.id == selectedData.id);
-        copyData[index] = { ...copyData[index], title: input };
-        setData(copyData);
-        setSelectedData("");
-      } else {
-        setData([...data, { id: data.length, title: input }]);
-      }
-      setInput("");
+	}else{
+		const allList={id:new Date().toTimeString()}
+		setitems([...allList,lists])
+		setLists(" ");
+	}
+}
+const saved = () => {
+    if (!update) {
+    } 
+     else if (update && !toggle) {
+      setItem(() => {
+        item.map((ele) => {
+          if (ele.id === edit) {
+            return {...ele, name: update};
+          }
+          return ele;
+        });
+      });
+      setToggle(true);
+      setUpdate("");
+      setEdit(null);
     }
-  }
-  function deletData(id) {
-    const filteredItems = data.filter((item) => item.id != id);
-    setData(filteredItems);
-  }
+  };
+const edits=(ind)=>{
+	const edited=lists.find((ele)=>{
+		return(<>
+		ind===ele.id
+		</>) 
+	});
+	setToggle(false);
+	setUpdate(edited.name);
+	setEdit(ind);
+}
 
-  function editData(item) {
-	  if (!item && /^\s*$/.test(item)) {
-      return;
-    }
-    setSelectedData(item);
-    setInput(item.title);
-  }
+const del=(ind)=>{
+const uplists=lists.filter((ele)=> ele.id!==ind)
+   setLists([...uplists]);
+}
 
-	return (
+	return ( 
 	<div id="main">
-	<textarea id="task" value={input} onChange={getInput} cols="20" rows="1"></textarea>
-	<button id="btn" onClick={addData}>Add</button>
-	<ul>
-        {data.map((item) => (
-        <div key={item.id}>
-            <li className="list">{item.title}</li>
-		<button className="delete" onClick={() => deletData(item.id)}>Delete</button>
-            	<button className="edit" onClick={() => editData(item)}>Edit</button>
-	</div>
-        ))}
-      </ul>
+	//Do not alter main div
+	//Please do not alter the functional component as tests depend on the type of component.
+	{ 
+	toggle?
+	<>
+	<input id="task" type="text" placeholder="Add Task" onChange={(e)=>setLists(e.target.value)} value={lists} />
+	<button id="btn" onClick={click}>ADD Task</button></>:<><input   className="editTask" type="text"
+            onChange={(e) => setUpdate(e.target.value)}
+            value={update}
+          />
+          <button className="saveTask" onClick={()=>saved()}>
+            Save
+          </button></>
+    }
+    {
+		item.map((ele)=>{
+			return(
+				<ul key={ele.id}>
+					<li className="list">{ele}</li>
+					<button className="edit" onClick={()=>edits(ele.id)}>edit</button>
+					<button className="delete" onClick={()=>del(ele.id)}>delete</button>
+				</ul>
+			)
+		})
+	}
+
 	</div>
 	);
 }
